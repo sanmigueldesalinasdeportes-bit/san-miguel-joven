@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administración · San Miguel Joven</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <main id="principal">
+    <!-- Acceso -->
+    <section class="vista vista-centro" data-vista="login">
+      <form class="panel" id="form-login" novalidate>
+        <h1 class="titulo-m">Administración</h1>
+        <p>Resultados de San Miguel Joven. Solo para el equipo organizador.</p>
+        <label class="campo">
+          <span>Contraseña</span>
+          <input id="clave" type="password" autocomplete="current-password" required aria-describedby="login-msg" style="letter-spacing:0;text-transform:none;font-size:1.15rem">
+        </label>
+        <p class="msg" id="login-msg" role="alert"></p>
+        <button class="btn btn-oro" type="submit" id="btn-login">Entrar</button>
+      </form>
+    </section>
+
+    <!-- Panel -->
+    <section class="vista" data-vista="panel" hidden>
+      <div class="admin">
+        <div class="admin-cab">
+          <h1 class="titulo-m">Resultados</h1>
+          <div class="fila-botones no-imprimir">
+            <button class="btn btn-claro" type="button" id="btn-actualizar">Actualizar</button>
+            <button class="btn btn-claro" type="button" id="btn-salir">Salir</button>
+          </div>
+        </div>
+        <p class="msg" id="panel-msg" role="alert"></p>
+
+        <div class="cifras" id="cifras" aria-live="polite"></div>
+
+        <section class="bloque" aria-labelledby="h-ranking">
+          <h2 id="h-ranking">Orden de popularidad</h2>
+          <p>Monedas recibidas por cada categoría, de más a menos. El porcentaje es sobre el total de monedas repartidas.</p>
+          <div class="grafico" id="grafico"></div>
+        </section>
+
+        <section class="bloque" aria-labelledby="h-tabla">
+          <h2 id="h-tabla">Datos</h2>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Puesto</th><th>Categoría</th><th class="num">Monedas</th><th class="num">%</th><th class="num">Jugadas con 0</th></tr></thead>
+              <tbody id="tabla"></tbody>
+            </table>
+          </div>
+          <div class="fila-botones">
+            <button class="btn btn-oro" type="button" data-csv="/api/admin/csv/resumen">Descargar resumen (CSV)</button>
+            <button class="btn btn-claro" type="button" data-csv="/api/admin/csv/jugadas">Descargar jugadas anónimas (CSV)</button>
+          </div>
+        </section>
+
+        <section class="bloque" aria-labelledby="h-codigos" id="bloque-codigos">
+          <h2 id="h-codigos">Códigos de participación</h2>
+          <p>Cada código permite enviar una sola jugada. Genera los que necesites, descárgalos y repártelos (por ejemplo, impresos en tarjetas). La jugada no queda unida al código.</p>
+          <form class="campo-linea" id="form-codigos">
+            <label class="campo"><span>Cantidad</span><input type="number" id="cantidad" min="1" max="500" value="30" inputmode="numeric"></label>
+            <button class="btn btn-oro" type="submit" id="btn-generar">Generar códigos</button>
+            <button class="btn btn-claro" type="button" data-csv="/api/admin/codigos/csv">Descargar todos (CSV)</button>
+          </form>
+          <p class="nota" id="codigos-resumen"></p>
+          <div class="codigos-lista" id="codigos-lista"></div>
+        </section>
+
+        <section class="bloque" aria-labelledby="h-sorteo" id="bloque-sorteo">
+          <h2 id="h-sorteo">Sorteo</h2>
+          <div class="cifras" id="sorteo-cifras"></div>
+
+          <div id="sorteo-pendiente">
+            <p>Cada papeleta tiene la misma probabilidad de salir, así que quien ha enviado más jugadas tiene más opciones. Una misma persona (mismo nombre y apellidos) solo puede salir una vez.</p>
+            <form class="campo-linea" id="form-realizar">
+              <label class="campo"><span>Premios</span><input type="number" id="n-premios" min="1" max="100" value="9" inputmode="numeric"></label>
+              <label class="campo"><span>Suplentes</span><input type="number" id="n-suplentes" min="0" max="50" value="3" inputmode="numeric"></label>
+              <label class="campo"><span>Qué se publica en la web</span>
+                <select id="publicar">
+                  <option value="numeros">Solo los números (recomendado)</option>
+                  <option value="nombres">Número y nombre con inicial (Leo R.)</option>
+                </select></label>
+              <label class="check"><input type="checkbox" id="ok-publicar"> Entiendo que los números premiados se publicarán en la web y que, una vez hecho, ya no se admiten papeletas</label>
+              <button class="btn btn-oro" type="submit" id="btn-realizar">Hacer el sorteo</button>
+            </form>
+            <div id="sorteo-ultimas"></div>
+          </div>
+
+          <div id="sorteo-hecho" hidden>
+            <p id="sorteo-hecho-texto"></p>
+            <h3>Ganadores</h3>
+            <div class="tabla-wrap"><table>
+              <thead><tr><th>Nº</th><th>Nombre y apellidos</th><th>Menor de 14</th><th>En la web</th></tr></thead>
+              <tbody id="tabla-ganadores"></tbody>
+            </table></div>
+            <h3 id="h-suplentes">Suplentes, por orden</h3>
+            <div class="tabla-wrap"><table>
+              <thead><tr><th>Nº</th><th>Nombre y apellidos</th><th>Menor de 14</th><th>En la web</th></tr></thead>
+              <tbody id="tabla-suplentes"></tbody>
+            </table></div>
+            <form class="campo-linea" id="form-publicacion">
+              <label class="campo"><span>Qué se publica en la web</span>
+                <select id="publicar-hecho">
+                  <option value="numeros">Solo los números</option>
+                  <option value="nombres">Número y nombre con inicial</option>
+                </select></label>
+              <button class="btn btn-claro" type="submit">Guardar</button>
+            </form>
+            <p class="nota">Los apellidos completos nunca se publican. Para entregar el premio, comprueba el número y el nombre de quien lo recoge; si es menor de 14, que venga con su madre, padre o tutor/a.</p>
+          </div>
+
+          <div class="fila-botones">
+            <button class="btn btn-claro" type="button" data-csv="/api/admin/sorteo/csv">Descargar papeletas (CSV)</button>
+            <a class="btn btn-claro" href="/#sorteo" target="_blank" rel="noopener">Ver la web pública</a>
+          </div>
+
+          <form class="campo-linea zona-anular" id="form-anular" hidden>
+            <label class="campo"><span>Escribe ANULAR</span><input type="text" id="confirmar-anular" autocomplete="off"></label>
+            <button class="btn btn-peligro" type="submit">Anular el sorteo</button>
+            <p class="nota">Quita el resultado de la web y vuelve a abrir las papeletas. Úsalo solo si ha habido un error.</p>
+          </form>
+
+          <form class="campo-linea" id="form-borrar-sorteo">
+            <label class="campo"><span>Escribe BORRAR</span><input type="text" id="confirmar-sorteo" autocomplete="off"></label>
+            <button class="btn btn-peligro" type="submit">Borrar datos personales del sorteo</button>
+            <p class="nota">Hazlo cuando se hayan entregado los premios. Se borran nombres y apellidos; lo publicado en la web se mantiene.</p>
+          </form>
+        </section>
+
+        <section class="bloque zona-peligro no-imprimir" aria-labelledby="h-borrar">
+          <h2 id="h-borrar">Borrar votos</h2>
+          <p>Úsalo solo para limpiar pruebas antes de abrir la votación. No se puede deshacer: descarga antes el CSV.</p>
+          <form class="campo-linea" id="form-borrar">
+            <label class="campo"><span>Escribe BORRAR</span><input type="text" id="confirmar" autocomplete="off"></label>
+            <label class="check"><input type="checkbox" id="liberar" checked> Volver a dejar libres los códigos usados</label>
+            <button class="btn btn-peligro" type="submit">Borrar todos los votos</button>
+          </form>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>

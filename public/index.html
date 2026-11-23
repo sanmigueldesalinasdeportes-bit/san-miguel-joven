@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>San Miguel Joven · El futuro está en tus manos</title>
+  <meta name="description" content="Reparte tus 100 monedas entre las actividades que quieres en San Miguel de Salinas.">
+  <meta name="theme-color" content="#CFE8D6">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <a class="saltar" href="#principal">Saltar al contenido</a>
+
+  <main id="principal">
+    <!-- Cargando -->
+    <section class="vista vista-carga" data-vista="carga" aria-live="polite">
+      <div class="moneda moneda-gira" aria-hidden="true"></div>
+      <p>Preparando el tablero…</p>
+    </section>
+
+    <!-- Error de carga -->
+    <section class="vista vista-centro" data-vista="fallo" hidden>
+      <div class="panel">
+        <h1 class="titulo-m">No hemos podido abrir el tablero</h1>
+        <p id="fallo-texto">Comprueba tu conexión y vuelve a intentarlo.</p>
+        <button class="btn btn-oro" type="button" data-accion="recargar">Volver a intentarlo</button>
+      </div>
+    </section>
+
+    <!-- Portada -->
+    <section class="vista vista-portada" data-vista="portada" hidden>
+      <div class="tablero-borde" aria-hidden="true" id="borde-casillas"></div>
+      <div class="portada-centro">
+        <p class="portada-org">Ayuntamiento de San Miguel de Salinas</p>
+        <h1 class="titulo-xl">San Miguel <span>Joven</span></h1>
+        <p class="lema">El futuro está en tus manos</p>
+
+        <ol class="pasos">
+          <li><span class="paso-ficha">1</span><span>Recibes <b>100 monedas</b>.</span></li>
+          <li><span class="paso-ficha">2</span><span>Repártelas entre <b>8 casillas</b> según lo que te gustaría hacer.</span></li>
+          <li><span class="paso-ficha">3</span><span>Envía tu jugada. Las casillas con más monedas tendrán más peso al planificar.</span></li>
+        </ol>
+
+        <p class="aviso-sorteo" id="aviso-sorteo" hidden>
+          <span class="mini-papeleta" aria-hidden="true">Nº</span>
+          <span>Cada jugada que envíes te da <b>una papeleta</b> para el sorteo de <b data-premio></b>. Cuantas más jugadas, más papeletas.</span>
+        </p>
+
+        <button class="btn btn-oro btn-xl" type="button" data-accion="empezar">
+          <span class="moneda moneda-s" aria-hidden="true"></span>
+          Empezar a jugar
+        </button>
+        <p class="nota">Las monedas son simbólicas: no es dinero real y no pagas nada. Tu jugada es anónima.</p>
+
+        <section class="sorteo-pub" id="sorteo" aria-labelledby="h-sorteo" hidden>
+          <h2 class="titulo-m" id="h-sorteo">Números premiados</h2>
+          <p id="sorteo-pub-texto"></p>
+          <ul class="papeletas" id="sorteo-ganadores"></ul>
+          <div id="sorteo-suplentes-wrap" hidden>
+            <h3>Suplentes, por orden</h3>
+            <p class="nota">Si alguna persona premiada no recoge su premio, pasa al primer suplente.</p>
+            <ul class="papeletas papeletas-s" id="sorteo-suplentes"></ul>
+          </div>
+          <p class="nota">Si tu número aparece, recoge tu premio en el Área de Deportes enseñando tu número. Información: WhatsApp 673 501 180.</p>
+        </section>
+      </div>
+    </section>
+
+    <!-- Código de participación -->
+    <section class="vista vista-centro" data-vista="codigo" hidden>
+      <form class="panel" id="form-codigo" novalidate>
+        <button class="btn-volver" type="button" data-accion="ir-portada">Volver</button>
+        <h1 class="titulo-m">Tu código de jugador</h1>
+        <p>Está en la tarjeta que te han dado. Cada código sirve para una sola jugada.</p>
+        <label class="campo">
+          <span>Código</span>
+          <input id="codigo" name="codigo" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9" placeholder="ABCD-1234" required aria-describedby="codigo-msg">
+        </label>
+        <p class="msg" id="codigo-msg" role="alert"></p>
+        <button class="btn btn-oro" type="submit" id="btn-codigo">Entrar al tablero</button>
+      </form>
+    </section>
+
+    <!-- Reparto -->
+    <section class="vista vista-reparto" data-vista="reparto" hidden>
+      <header class="banca" aria-label="Tus monedas">
+        <div class="banca-fila">
+          <div class="banca-quedan">
+            <span class="moneda moneda-m" aria-hidden="true"></span>
+            <p><span class="banca-num" id="quedan">100</span> <span class="banca-txt" id="quedan-txt">monedas por repartir</span></p>
+          </div>
+          <button class="btn-texto" type="button" data-accion="reiniciar">Reiniciar</button>
+        </div>
+        <div class="pista" id="pista" aria-hidden="true"></div>
+        <p class="banca-sub"><span id="asignadas">0</span> de 100 repartidas</p>
+        <p class="sr-only" aria-live="polite" id="anuncio"></p>
+      </header>
+
+      <div class="reparto-intro">
+        <h1 class="titulo-m">Reparte tus monedas</h1>
+        <p>Pon más monedas en lo que más te apetece. Puedes dejar casillas a 0. Mantén pulsado + o − para ir más rápido.</p>
+      </div>
+
+      <ul class="casillas" id="casillas"></ul>
+
+      <footer class="barra-accion">
+        <p class="msg-ayuda" id="ayuda">Te quedan 100 monedas por repartir.</p>
+        <button class="btn btn-oro" type="button" data-accion="revisar" id="btn-revisar" disabled>Revisar mi jugada</button>
+      </footer>
+    </section>
+
+    <!-- Revisión -->
+    <section class="vista vista-revision" data-vista="revision" hidden>
+      <div class="revision">
+        <button class="btn-volver" type="button" data-accion="ir-reparto">Cambiar reparto</button>
+        <h1 class="titulo-m">Así queda tu tablero</h1>
+        <p>Cada casilla es una moneda. Revisa tu reparto antes de enviarlo: después no se puede cambiar.</p>
+        <div class="rejilla" id="rejilla-revision" role="img"></div>
+        <ol class="resumen" id="resumen"></ol>
+        <p class="msg" id="envio-msg" role="alert"></p>
+        <div class="acciones">
+          <button class="btn btn-oro btn-xl" type="button" data-accion="enviar" id="btn-enviar">Enviar mi jugada</button>
+          <button class="btn btn-claro" type="button" data-accion="ir-reparto">Cambiar reparto</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Confirmación -->
+    <section class="vista vista-centro" data-vista="enviado" hidden>
+      <div class="panel panel-ok" tabindex="-1" id="panel-ok">
+        <div class="sello" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25l9 9 17-19"/></svg>
+        </div>
+        <h1 class="titulo-m">¡Jugada registrada!</h1>
+        <p>Tus 100 monedas ya cuentan. Con las jugadas de toda la gente joven del pueblo decidiremos qué actividades organizar primero.</p>
+        <div class="rejilla rejilla-s" id="rejilla-final" role="img"></div>
+
+        <div class="caja-sorteo" id="caja-sorteo" hidden>
+          <span class="mini-papeleta" aria-hidden="true">Nº</span>
+          <p>Esta jugada te da <b>1 papeleta</b> para el sorteo de <b data-premio></b>.</p>
+          <button class="btn btn-oro" type="button" data-accion="ir-sorteo">Conseguir mi papeleta</button>
+        </div>
+
+        <button class="btn btn-claro" type="button" data-accion="otra-jugada">Hacer otra jugada</button>
+      </div>
+    </section>
+
+    <!-- Datos para el sorteo -->
+    <section class="vista vista-centro" data-vista="sorteo" hidden>
+      <form class="panel" id="form-sorteo" novalidate>
+        <button class="btn-volver" type="button" data-accion="volver-enviado">Volver</button>
+        <h1 class="titulo-m">Tu papeleta</h1>
+        <p>Escribe tu nombre para entrar en el sorteo de <b data-premio></b>. Solo se usa para el sorteo y no se une a tu jugada.</p>
+
+        <fieldset class="opciones">
+          <legend>¿Tienes 14 años o más?</legend>
+          <label><input type="radio" name="edad" value="si" required> Sí</label>
+          <label><input type="radio" name="edad" value="no"> No, tengo 12 o 13</label>
+        </fieldset>
+
+        <label class="campo campo-texto"><span>Nombre</span>
+          <input name="nombre" type="text" autocomplete="given-name" maxlength="60" required></label>
+        <label class="campo campo-texto"><span>Apellidos</span>
+          <input name="apellidos" type="text" autocomplete="family-name" maxlength="80" required></label>
+        <details class="lopd">
+          <summary>Información sobre protección de datos</summary>
+          <div>
+            <p><b>Responsable:</b> Ayuntamiento de San Miguel de Salinas.</p>
+            <p><b>Para qué:</b> gestionar tu participación en el sorteo de <span data-premio></span> y comprobar quién recoge cada premio.</p>
+            <p><b>Base legal:</b> tu consentimiento o, si tienes menos de 14 años, el de tu madre, padre o tutor/a legal.</p>
+            <p><b>Qué datos:</b> solo tu nombre, apellidos y si tienes 14 años o más.</p>
+            <p><b>Quién los ve:</b> solo el equipo organizador. En la web se publican los números premiados y, como mucho, el nombre con la inicial del apellido (por ejemplo, «Leo R.»).</p>
+            <p><b>Cuánto tiempo:</b> hasta que se entreguen los premios. Después se borran.</p>
+            <p><b>Tus derechos:</b> puedes pedir ver, corregir o borrar tus datos, o retirar tu consentimiento, en el Ayuntamiento o en el Área de Deportes (WhatsApp 673 501 180). También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
+            <p>Tu reparto de monedas se guarda por separado y sigue siendo anónimo.</p>
+          </div>
+        </details>
+
+        <label class="check check-largo">
+          <input type="checkbox" name="consentimiento" required>
+          <span id="txt-consentimiento">He leído la información sobre protección de datos y acepto que se usen mis datos para este sorteo.</span>
+        </label>
+        <label class="check check-largo">
+          <input type="checkbox" name="recordar">
+          <span>Recordar mi nombre en este móvil para la próxima jugada</span>
+        </label>
+
+        <p class="msg" id="sorteo-msg" role="alert"></p>
+        <button class="btn btn-oro" type="submit" id="btn-papeleta">Conseguir mi papeleta</button>
+      </form>
+    </section>
+
+    <!-- Papeleta conseguida -->
+    <section class="vista vista-centro" data-vista="papeleta" hidden>
+      <div class="panel panel-ok">
+        <h1 class="titulo-m">¡Ya estás en el sorteo!</h1>
+        <div class="papeleta-grande">
+          <span>Tu número</span>
+          <b id="papeleta-num">0000</b>
+          <span data-premio></span>
+        </div>
+        <p><b>Haz una captura de pantalla o apúntalo.</b> Lo necesitarás para recoger el premio si sale tu número.</p>
+        <p class="nota">Cada jugada nueva te da otra papeleta. Una persona solo puede ganar un premio.</p>
+        <button class="btn btn-oro" type="button" data-accion="otra-jugada">Hacer otra jugada</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

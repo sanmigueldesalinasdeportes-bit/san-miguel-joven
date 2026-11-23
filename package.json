@@ -1,0 +1,16 @@
+{
+  "name": "san-miguel-joven",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "San Miguel Joven: El Futuro está en tus manos — reparto de 100 monedas entre actividades juveniles",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/blobs": ">=8.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
